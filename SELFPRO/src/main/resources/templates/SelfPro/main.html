@@ -1,0 +1,131 @@
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{/SelfPro/layout}">
+<div layout:fragment="content">
+
+	<!-- 회원정보 , 오늘의 할 일-->
+	<div class="container mt-5 mb-5">
+
+		<div th:if="${member != null}" class="mt-4 mb-1">
+			<span class="fw-bold"> NEXT LEVELまで <span
+					th:text=" '(' + ${(member.dailyEXP % 100)} + ' / 100 )'"></span> </span>
+			<div class="progress my-2 " role="progressbar" aria-label="Success example" aria-valuenow="25"
+				aria-valuemin="0" aria-valuemax="100" style="height: 35px">
+				<div class="progress-bar bg-success progress-bar-striped"
+					th:style="'width: ' + ${(member.dailyEXP % 100)} + '%'" role="progressbar"></div>
+			</div>
+		</div>
+
+
+		<div class="row">
+			<!-- 왼쪽: 회원 정보 -->
+			<div class="col-md-4" sec:authorize="isAuthenticated()">
+				<div class="card shadow-sm">
+					<div class="card-body">
+						<h5 class="card-title">ステータス</h5>
+						<div th:if="${member != null}">
+							<p>ID: <span th:text="${member.memberLoginID}"></span></p>
+							<p>LEVEL: <span th:text="${member.memberLevel}"></p>
+							<p>今まで獲得したXPポイント: <span th:text="${member.dailyEXP}"></p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!--회원 아닐 떄 왼쪽-->
+			<div class="col-md-4" sec:authorize="isAnonymous()">
+				<div class="card shadow-sm">
+					<div class="card-body">
+						<h5 class="card-title">このサイトについて</h5>
+						<div>
+							<p>このサイトでは毎日のタスクを設定し、</p>
+							<p>一日の最後に採点をして</p>
+							<p>自分の成長を直感的に確認できます。</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 오른쪽: 오늘의 할 일 -->
+			<div class="col-md-8" sec:authorize="isAuthenticated()">
+				<div class="card shadow-sm">
+					<div class="card-body">
+						<h5 class="card-title">今日のタスク</h5>
+						<ul>
+							<li th:each="todoList : ${todos}" th:if="${todoList != null}" th:text="${todoList.content}">
+							</li>
+						</ul>
+						<!-- 채점 버튼 (확정 버튼) -->
+						<div class="text-end">
+							<a th:href="@{/todo/checkpage}" class="btn btn-success">記録する</a>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 회원 아닐 때 오른쪽 -->
+			<div class="col-md-8" sec:authorize="isAnonymous()">
+				<div class="card shadow-sm">
+					<div class="card-body">
+						<h5 class="card-title">今日のタスク</h5>
+						<ul>
+							<li>利用するには会員登録が必要です。</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- 내일의 과제! -->
+	<div class="container py-1" sec:authorize="isAuthenticated()">
+		<a th:href="@{/todo/settingpage}" class="btn btn-warning w-100 py-3 fs-3"> 明日のタスクを登録　[Click!]</a>
+	</div>
+
+
+	<!-- 어제로부터의 한마디 -->
+	<div class="container my-5">
+		<div class="card shadow-sm border-0"
+			style="background: linear-gradient(to right, #d0dfeb, #57ccf3); border-radius: 16px;">
+			<div class="card-body text-center py-5">
+				<h5 class="fw-bold mb-4" style="font-size: 1.5rem;" th:if="${hitogoto != null}">昨日の自分からのひとこと</h5>
+				<h5 class="fw-bold mb-4" style="font-size: 1.5rem;" th:if="${hitogoto == null}">応援メッセージ</h5>
+				<blockquote class="blockquote">
+					<p style="font-size: 1.25rem; font-style: italic;" th:if="${hitogoto != null}"
+						th:text="${hitogoto}"></p>
+					<p style="font-size: 1.25rem; font-style: italic;" th:if="${hitogoto == null}">昨日の自分より１％でも成長したら、成功だ。</p>
+				</blockquote>
+			</div>
+		</div>
+	</div>
+
+	<!-- 랭킹 확인 
+	    <div class="container my-5">
+	      <div class="card shadow-sm border-0">
+	        <div class="card-header bg-primary text-white text-center fw-bold" style="font-size: 1.3rem;">
+	          💪 이번 주 랭킹 TOP 5 (기능 보류)
+	        </div>
+	        <ul class="list-group list-group-flush">
+	          <li class="list-group-item d-flex justify-content-between align-items-center">
+	            🥇 <span class="fw-bold">코딩짱</span> <span class="badge bg-success rounded-pill">1020 XP</span>
+	          </li>
+	          <li class="list-group-item d-flex justify-content-between align-items-center">
+	            🥈 <span class="fw-bold">헬스는진심</span> <span class="badge bg-success rounded-pill">980 XP</span>
+	          </li>
+	          <li class="list-group-item d-flex justify-content-between align-items-center">
+	            🥉 <span class="fw-bold">매일30분</span> <span class="badge bg-success rounded-pill">950 XP</span>
+	          </li>
+	          <li class="list-group-item d-flex justify-content-between align-items-center">
+	            4위 <span class="fw-bold">책벌레</span> <span class="badge bg-secondary rounded-pill">910 XP</span>
+	          </li>
+	          <li class="list-group-item d-flex justify-content-between align-items-center">
+	            5위 <span class="fw-bold">타임관리러</span> <span class="badge bg-secondary rounded-pill">890 XP</span>
+	          </li>
+	        </ul>
+	      </div>
+	    </div>
+		-->
+
+
+
+</div>
+
+</html>

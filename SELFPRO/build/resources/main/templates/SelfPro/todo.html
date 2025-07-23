@@ -1,0 +1,101 @@
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{/SelfPro/layout}">
+<div layout:fragment="content">
+
+
+	<div class="container my-5">
+
+		<!--성공 실패 피드백-->
+		<div th:if="${todoListLessThan1}" class="alert alert-danger text-center mt-3">
+			保存するには最低1件のタスクを登録する必要があります。
+		</div>
+		<div th:if="${todoListSuccess}" class="alert alert-success text-center mt-3">
+			明日のタスクを保存しました。
+		</div>
+
+		<div class="card shadow-sm p-4">
+			<h3 class="text-center mb-5">明日のタスク登録</h3>
+
+			<form th:action="${todos == null || todos.isEmpty() ? '/todo/creategoal' : '/todo/updategoal'}"
+				method="post" target="_self">
+				<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+				<!-- 할 일 목록들 -->
+				<ul class="list-group mb-5" id="todo-list">
+					<!-- todos 리스트를 출력 -->
+					<li th:each="todoList : ${todos}" th:if="${todoList != null}"
+						class="list-group-item d-flex justify-content-between align-items-center">
+						<input type="text" name="todos" class="form-control" th:value="${todoList.content}" />
+						<button class="btn btn-danger btn-sm ms-2" onclick="deleteItem(this, event)">X</button>
+					</li>
+				</ul>
+
+				<div class="input-group my-3">
+					<input type="text" id="newItemInput" class="form-control" placeholder="新しいタスクを入力" />
+					<button type="button" class="btn btn-success" onclick="addItem()">登録</button>
+				</div>
+
+				<div class="form-text">* タスクを1つ完了すると＋5ポイント、完了できなければー5ポイントとなります。</div>
+				<div class="form-text">* タスクを編集したい場合はテキストボックスをクリックしてください。</div>
+
+				<div class="d-flex justify-content-end">
+					<button th:if="${todos == null || todos.isEmpty()}" type="submit"
+						class="btn btn-primary mt-3 px-4">保存</button>
+					<button th:if="${todos != null && !todos.isEmpty()}" type="submit"
+						class="btn btn-success mt-3 px-4">更新</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- 수정, 추가 스크립트 -->
+	<script>
+		// 모든 Enter 키 눌림 방지
+		document.addEventListener('keydown', function (e) {
+			if (e.key === "Enter") {
+				e.preventDefault(); // Enter 키의 기본 동작을 방지
+			}
+		});
+
+		function addItem() {
+			const input = document.getElementById("newItemInput");
+			const text = input.value.trim();
+			if (text !== "") {
+				const li = document.createElement("li");
+				li.className = "list-group-item d-flex justify-content-between align-items-center";
+
+				// 텍스트 입력 필드
+				const inputElement = document.createElement("input");
+				inputElement.type = "text";
+				inputElement.className = "form-control";
+				inputElement.value = text;
+				inputElement.setAttribute("name", "todos");
+
+				// 삭제 버튼
+				const btn = document.createElement("button");
+				btn.textContent = "X";
+				btn.className = "btn btn-danger btn-sm ms-2";
+				btn.onclick = function (event) {
+					event.stopPropagation(); // 이벤트 전파를 막아서 클릭이 다른 동작을 일으키지 않게 합니다
+					li.remove(); // 클릭된 항목 삭제
+				};
+
+				li.appendChild(inputElement);
+				li.appendChild(btn);
+				document.getElementById("todo-list").appendChild(li);
+				input.value = "";
+			}
+		}
+
+		function deleteItem(button, event) {
+			event.stopPropagation(); // 이벤트 전파를 막아서 다른 클릭 동작이 실행되지 않도록 합니다
+			const li = button.closest('li'); // 클릭된 삭제 버튼의 부모 li를 찾습니다
+			li.remove(); // 해당 li를 삭제합니다
+		}
+	</script>
+
+	<!-- 부트스트랩2 -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+		crossorigin="anonymous"></script>
+</div>
+
+</html>
